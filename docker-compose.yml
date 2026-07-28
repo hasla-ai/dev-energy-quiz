@@ -1,0 +1,15 @@
+version: '3.8'  # Docker Compose 파일 규격 버전
+
+services:       # 실행할 컨테이너들을 정의하는 묶음
+  quiz-web:     # 서비스 이름 (내 마음대로 정함)
+    build: .    # 현재 폴더(.)에 있는 Dockerfile을 읽어서 이미지를 빌드해!
+    
+    container_name: dev-energy-quiz-container # 컨테이너에 붙일 이름
+    
+    ports:
+      - "8080:80" # [내 컴퓨터 포트]:[컨테이너 내부 포트] 연결
+      
+    volumes:
+      - .:/usr/share/nginx/html # [내 컴퓨터 폴더]:[컨테이너 내부 폴더] 실시간 동기화
+      
+    restart: always # 컨테이너가 꺼지면 자동으로 다시 켜줘!
