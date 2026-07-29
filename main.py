@@ -171,6 +171,25 @@ def add_quiz(quizzes):
 # elif choice == 2:
 #     add_quiz(quizzes)
 
+def list_quizzes(quizzes):
+    """저장된 모든 퀴즈의 목록을 번호와 함께 출력합니다."""
+    print("\n--- 등록된 퀴즈 목록 ---")
+    
+    # 1. 퀴즈가 없는 경우 처리
+    if not quizzes:
+        print("[알림] 현재 등록된 퀴즈가 없습니다. 새로운 퀴즈를 추가해보세요!")
+        return
+
+    # 2. 퀴즈 목록 출력: 문제 내용과 정답 번호만 간략히. 리스트 인덱스를 1부터.
+    for i, quiz in enumerate(quizzes, 1):
+        print(f"{i}. {quiz.question} (정답: {quiz.answer}번)")
+    
+    print(f"\n총 {len(quizzes)}개의 퀴즈가 등록되어 있습니다.")
+
+# main 함수 내 메뉴 연결
+# elif choice == 3:
+#     list_quizzes(quizzes)
+
 def main():
     quizzes = load_data()
     
