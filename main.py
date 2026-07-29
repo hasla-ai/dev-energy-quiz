@@ -4,6 +4,9 @@ import random
 
 SCORE_FILE = "score.json"
 
+# ==========================================
+# 1. 개별 퀴즈 정보를 담는 클래스 (기존 동일)
+# ==========================================
 class Quiz:
     def __init__(self, question, choices, answer):
         self.question = question
@@ -25,33 +28,108 @@ class Quiz:
             "answer": self.answer,
         }
 
-# 기본 데이터
-DEFAULT_QUIZ_DATA = [
-    Quiz(
-        "증기기관에 대한 설명으로 가장 옳지 않은 것은?",
-        [
-            "열에너지를 기계적 에너지로 변환하는 장치이다.",
-            "물이 끓을 때 발생하는 수증기의 팽창 압력을 이용한다.",
-            "산업 혁명의 원동력이 되었다.",
-            "화석 연료를 전혀 사용하지 않는 친환경 기관이다.",
-        ],
-        4,
-    ),
-    Quiz(
-        "증기기관의 작동 원리와 가장 깊은 관련이 있는 물리적 법칙은?",
-        ["질량 보존의 법칙", "열역학 제2법칙", "관성의 법칙", "옴의 법칙"],
-        2,
-    ),
-]
-
+# ==========================================
+# 2. 퀴즈 게임 전체를 관리하는 메인 클래스
+# ==========================================
 class QuizGame:
     def __init__(self):
+    # 상수 및 설정값
+        # 파일 경로 설정
         self.quiz_file = "quizzes.json"
         self.score_file = "score.json"
+        
+        # 데이터 로드 (초기화 시 자동 실행))
         self.quizzes = self.load_quizzes()
+        self.high_score = self.load_score()
+
+    def load_quizzes(self):
+        # 퀴즈 데이터를 파일에서 로드합니다. 파일이 없거나 오류가 발생하면 기본 데이터를 반환합니다.
+        try:
+            if os.path.exists(self.quiz_file):
+                with open(self.quiz_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            print(f"\n[경고] {self.quiz_file} 읽기 오류! 기본 데이터를 사용합니다.")
+        
+        # 파일이 없거나 오류 시 반환할 기본 퀴즈
+        return [
+            {"question": "증기기관을 개량한 사람은?", "options": ["와트", "뉴턴", "에디슨", "테슬라"], "answer": 1}
+        ]
+
+    def save_quizzes(self):
+        # 퀴즈 데이터를 파일에 저장합니다.
+        try:
+            with open(self.quiz_file, 'w', encoding='utf-8') as f:
+                json.dump(self.quizzes, f, indent=4, ensure_ascii=False)
+                # indent=4로 보기 좋게 저장, ensure_ascii=False로 한글 깨짐 방지
+        except IOError as e:
+            print(f"퀴즈 저장 중 오류 발생: {e}")
+
+    def load_score(self):
+        # 최고 점수를 파일에서 로드합니다. 파일이 없거나 오류가 발생하면 0을 반환합니다.
+        try:
+            if os.path.exists(self.score_file):
+                with open(self.score_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    return data.get("best_score", 0) # 키가 없으면 0 반환
+        except (json.JSONDecodeError, IOError):
+            pass
+        return 0
+
+    def save_score(self):
+        # 최고 점수를 파일에 저장합니다.
+        try:
+            with open(self.score_file, 'w', encoding='utf-8') as f:
+                # 점수는 딕셔너리 형태로 감싸서 저장하는 것이 확장성에 좋습니다.
+                json.dump({"best_score": self.high_score}, f, indent=4)
+        except IOError as e:
+            print(f"점수 저장 중 오류 발생: {e}")
+
+    # 기본 데이터
+    DEFAULT_QUIZ_DATA = [
+        Quiz(
+            "증기기관에 대한 설명으로 가장 옳지 않은 것은?",
+            [
+                "열에너지를 기계적 에너지로 변환하는 장치이다.",
+                "물이 끓을 때 발생하는 수증기의 팽창 압력을 이용한다.",
+                "산업 혁명의 원동력이 되었다.",
+                "화석 연료를 전혀 사용하지 않는 친환경 기관이다.",
+            ],
+            4,
+        ),
+        Quiz(
+            "증기기관의 작동 원리와 가장 깊은 관련이 있는 물리적 법칙은?",
+            ["질량 보존의 법칙", "열역학 제2법칙", "관성의 법칙", "옴의 법칙"],
+            2,
+        ),    
+        Quiz(
+            "현대적 의미의 실용적인 증기기관을 최초로 발명한 사람은?",
+            ["토머스 뉴커먼", "제임스 와트", "토머스 세이버리", "리처드 트레비식"],
+            2,
+        ),       
+        Quiz(
+            "증기기관의 효율을 높이기 위해 제임스 와트가 고안한 장치는?",
+            ["증기 터빈", "증기 팽창기", "증기 응축기", "증기 압력계"],
+            3,
+        ),
+        Quiz(
+            "증기기관이 산업 혁명에 미친 영향으로 가장 적절한 것은?",
+            [
+                "농업 생산량 감소",
+                "수공업 중심의 경제 체제 강화",
+                "대량 생산과 공장제 기계 공업 발전",
+                "교통 수단의 전면적 퇴보",
+            ],
+            3,
+        ),  
+    ]
+# ------------------------------------------
+# 데이터 입출력 관련 메서드
+# ------------------------------------------
 
     # 데이터 관리
     def load_quizzes(self):
+        """파일에서 퀴즈 데이터를 로드합니다."""
         if not os.path.exists(self.quiz_file):
             print("\n[안내] 데이터 파일이 없어 기본 데이터를 로드합니다.")
             return DEFAULT_QUIZ_DATA.copy()
@@ -64,10 +142,12 @@ class QuizGame:
             return DEFAULT_QUIZ_DATA.copy()
 
     def save_quizzes(self):
+        """퀴즈 데이터를 파일에 저장합니다."""
         with open(self.quiz_file, 'w', encoding='utf-8') as f:
             json.dump([q.to_dict() for q in self.quizzes], f, ensure_ascii=False, indent=4)
 
     def load_high_score(self):
+        """최고 점수를 로드합니다."""
         if os.path.exists(self.score_file):
             try:
                 with open(self.score_file, 'r', encoding='utf-8') as f:
@@ -78,11 +158,16 @@ class QuizGame:
         return 0
 
     def save_high_score(self, score):
+        """최고 점수를 저장합니다."""
         with open(self.score_file, 'w', encoding='utf-8') as f:
             json.dump({"high_score": score}, f, ensure_ascii=False, indent=4)
 
-    # 유틸
+# ------------------------------------------
+# 유틸리티 입력 메서드
+# ------------------------------------------
+
     def get_safe_input(self, prompt, min_val=1, max_val=7):
+        """사용자 입력을 안전하게 처리합니다."""
         while True:
             try:
                 user_input = input(prompt).strip()
@@ -98,14 +183,18 @@ class QuizGame:
                 print(">> 잘못된 입력입니다. '숫자'만 입력 가능합니다.")
 
     def get_non_empty_string(self, prompt):
+        """비어 있지 않은 문자열을 입력받습니다."""
         while True:
             value = input(prompt).strip()
             if value:
                 return value
             print("[오류] 내용을 입력해주세요.")
 
-    # 게임 기능
+# ------------------------------------------
+# 메뉴별 주요 실행 기능 (기존 함수들 -> 클래스 메서드 변환)
+# ------------------------------------------
     def play_quiz(self):
+        """1. 퀴즈 풀기"""
         if not self.quizzes:
             print("\n[알림] 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해주세요.")
             return
@@ -125,23 +214,30 @@ class QuizGame:
         print(f"학습 종료! 최종 점수: {score} / {len(self.quizzes)}")
         print(f"정답률: {(score/len(self.quizzes))*100:.1f}%")
         print("="*30)
+
         # 최고점 저장
         high = self.load_high_score()
         if score > high:
             print("새로운 최고 기록입니다! 저장합니다.")
             self.save_high_score(score)
+            # 데이터가 변할 때마다 저장!
+            self.save_quizzes() 
 
     def add_quiz(self):
+        """2. 퀴즈 추가"""
         print("\n--- 새로운 퀴즈 추가 ---")
         question = self.get_non_empty_string("문제 내용을 입력하세요: ")
         choices = []
         for i in range(1,5):
             choices.append(self.get_non_empty_string(f"선택지 {i}번을 입력하세요: "))
         answer = self.get_safe_input("정답 번호를 입력하세요 (1~4): ", 1, 4)
+        # 새로운 Quiz 객체 추가    
         new_quiz = Quiz(question, choices, answer)
         self.quizzes.append(new_quiz)
         self.save_quizzes()
         print("\n[성공] 새로운 퀴즈가 추가되었습니다!")
+        # 데이터가 변할 때마다 저장!
+        self.save_quizzes() 
 
     def delete_quiz(self):
         if not self.quizzes:
@@ -156,8 +252,11 @@ class QuizGame:
             print(f"\n[성공] '{removed.question}' 문제가 삭제되었습니다.")
         else:
             print("\n[취소] 퀴즈 삭제가 취소되었습니다.")
+        # 데이터가 변할 때마다 저장!
+        self.save_quizzes() 
 
     def list_quizzes(self):
+        """3. 목록 보기"""
         print("\n--- 등록된 퀴즈 목록 ---")
         if not self.quizzes:
             print("[알림] 현재 등록된 퀴즈가 없습니다. 새로운 퀴즈를 추가해보세요!")
@@ -167,6 +266,7 @@ class QuizGame:
         print(f"\n총 {len(self.quizzes)}개의 퀴즈가 등록되어 있습니다.")
 
     def show_high_score(self):
+        """4. 점수 확인"""
         high_score = self.load_high_score()
         print("\n" + "="*30)
         if high_score == 0:
@@ -176,6 +276,7 @@ class QuizGame:
         print("="*30)
 
     def display_menu(self):
+        """메뉴 출력"""
         print("\n" + "="*30)
         print("   증기기관 퀴즈 프로그램")
         print("="*30)
@@ -185,6 +286,7 @@ class QuizGame:
         print("="*30)
 
     def run(self):
+        """프로그램 실행 메인 루프"""
         try:
             while True:
                 self.display_menu()
@@ -209,7 +311,9 @@ class QuizGame:
         finally:
             print("이용해 주셔서 감사합니다.")
 
-
+# ==========================================
+# 3. 메인 실행부 (단 2줄로 단순화)
+# ==========================================
 if __name__ == "__main__":
     game = QuizGame()
     game.run()
