@@ -1,6 +1,1 @@
-# OS 관련 파일
-.DS_Store
-Thumbs.db
-
-# Docker 관련 (필요한 경우만 제외, 보통 yml은 포함함)
-*.log
+__pycache__/
