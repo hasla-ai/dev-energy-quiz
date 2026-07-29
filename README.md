@@ -13,7 +13,7 @@ VS code 1.112.0
 x64
 Python 3.9.6  
 git version 2.54.0  
-![개발환경 설정 스크린샷](./images/setup_env.png)
+![개발환경 설정 스크린샷](./images/setup_dev.png)
 
 ## 2. 퀴즈 주제와 선정 이유
 *   **주제:** 증기기관 (Steam Engine)
