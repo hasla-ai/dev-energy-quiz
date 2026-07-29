@@ -128,6 +128,49 @@ def play_quiz(quizzes):
     print(f"정답률: {(score/len(quizzes))*100:.1f}%")
     print("="*30)
 
+# 퀴즈 추가 기능 구현
+def get_non_empty_string(prompt):
+    """공백이 아닌 문자열을 입력받을 때까지 반복합니다."""
+    while True:
+        value = input(prompt).strip()
+        if value:
+            return value
+        print("[오류] 내용을 입력해주세요.")
+
+def add_quiz(quizzes):
+    """새로운 퀴즈를 입력받아 리스트에 추가하고 파일에 저장합니다."""
+    print("\n--- 새로운 퀴즈 추가 ---")
+    
+    # 1. 문제 입력
+    question = get_non_empty_string("문제 내용을 입력하세요: ")
+    
+    # 2. 선택지 4개 입력
+    choices = []
+    for i in range(1, 5):
+        choice = get_non_empty_string(f"선택지 {i}번을 입력하세요: ")
+        choices.append(choice)
+    
+    # 3. 정답 번호 입력 (기존 예외 처리 함수 활용)
+    answer = get_safe_input("정답 번호를 입력하세요 (1~4): ", 1, 4)
+    ## get_safe_input 재사용: 정답 번호를 입력받을 때 이미 만들어둔 범주형 정수 입력 함수를 사용하여 1~4 사이의 숫자만 받도록 강제합니다.
+    
+    # 4. Quiz 객체 생성 및 리스트 추가
+    new_quiz = Quiz(question, choices, answer)
+    quizzes.append(new_quiz)
+    
+    # 5. 파일에 저장
+    ### 데이터 영속성(Persistence): 퀴즈를 리스트에 추가한 즉시 save_data(quizzes)를 호출하여 quizzes.json 파일에 쓰기 작업을 수행합니다. 이제 프로그램을 껐다 켜도 추가한 문제가 유지됩니다.
+
+    try:
+        save_data(quizzes)
+        print("\n[성공] 퀴즈가 안전하게 저장되었습니다!")
+    except Exception as e:
+        print(f"\n[오류] 저장 중 문제가 발생했습니다: {e}")
+
+# main 함수 내 메뉴 연결
+# elif choice == 2:
+#     add_quiz(quizzes)
+
 def main():
     quizzes = load_data()
     
