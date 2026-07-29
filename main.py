@@ -1,5 +1,6 @@
 import json
 import os
+import random
 class Quiz: 
     # __init__: 퀴즈 하나가 가져야 할 필수 정보(문제, 4개 선택지, 정답 번호)를 초기화
     def __init__(self, question, choices, answer):
@@ -93,6 +94,64 @@ def get_safe_input(prompt, min_val=1, max_val=7):
         
         except ValueError:
             print(">> 잘못된 입력입니다. '숫자'만 입력 가능합니다.")
+
+# 퀴즈 풀기 기능, main 함수에서 이를 호출하도록 수정.
+def play_quiz(quizzes):
+    """퀴즈 풀기 기능을 수행합니다."""
+    # 인스턴스화로 방지한 기능: 리스트가 비어있을 경우 안내 메시지를 출력하고 종료. 
+    if not quizzes:
+        print("\n[알림] 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해주세요.")
+        return
+
+    print(f"\n>>> 총 {len(quizzes)}문제를 시작합니다!")
+    score = 0
+    
+# 보너스 기능: 문제를 무작위로 섞어서 매번 다른 순서로 문제를 풀 수 있도록 출제.
+    quiz_pool = list(quizzes)
+    random.shuffle(quiz_pool)
+
+    for i, quiz in enumerate(quiz_pool, 1):
+        quiz.display_quiz(i)
+        # 1~4번 선택지 입력 받기
+        ## 이전에 만든 get_safe_input 함수를 재사용하여 1~4 이외의 값이나 문자 입력 시 자동으로 재입력을 유도
+        user_choice = get_safe_input("정답 번호 입력: ", 1, 4)
+        
+        if quiz.check_answer(user_choice):
+            print("=> 정답입니다! ✨")
+            score += 1
+        else:
+            print(f"=> 오답입니다. (정답: {quiz.answer})")
+
+    # 최종 결과 표시
+    print("\n" + "="*30)
+    print(f"학습 종료! 최종 점수: {score} / {len(quizzes)}")
+    print(f"정답률: {(score/len(quizzes))*100:.1f}%")
+    print("="*30)
+
+def main():
+    quizzes = load_data()
+    
+    try:
+        while True:
+            display_menu()
+            choice = get_safe_input("선택: ", 1, 7)
+
+            if choice == 1:
+                play_quiz(quizzes) # 퀴즈 풀기 함수 호출
+            elif choice == 2:
+                print("\n[기능] 퀴즈 추가 (다음 단계에서 구현)")
+            # ... (나머지 elif 생략) ...
+            elif choice == 7:
+                print("\n프로그램을 안전하게 종료합니다.")
+                break
+                
+    except (KeyboardInterrupt, EOFError):
+        print("\n\n[경고] 사용자에 의해 프로그램이 중단되었습니다.")
+    finally:
+        print("이용해 주셔서 감사합니다.")
+
+if __name__ == "__main__":
+    main()
 
 def display_menu():
     print("\n" + "="*30)
