@@ -190,6 +190,59 @@ def list_quizzes(quizzes):
 # elif choice == 3:
 #     list_quizzes(quizzes)
 
+# 점수 확인 기능 구현:높은 점수를 얻었을 때만 파일을 업데이트하고 축하 메시지.
+import json
+import os
+
+SCORE_FILE = "score.json"
+
+
+def load_high_score():
+    """파일에서 최고 점수를 불러옵니다. 파일이 없으면 0을 반환합니다."""
+    if os.path.exists(SCORE_FILE):
+        with open(SCORE_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data.get("high_score", 0)
+    return 0
+
+def save_high_score(score):
+    """최고 점수를 파일에 저장합니다."""
+    with open(SCORE_FILE, 'w', encoding='utf-8') as f:
+        json.dump({"high_score": score}, f, ensure_ascii=False, indent=4)
+
+def show_high_score():
+    """최고 점수를 화면에 출력합니다."""
+    high_score = load_high_score()
+    print("\n" + "="*30)
+    if high_score == 0:
+        print("아직 기록이 없습니다. 첫 퀴즈를 풀어보세요!") # 최고 기록이 없을 때 안내 메시지
+    else:
+        print(f"현재 최고 기록: {high_score}점 🏆")
+    print("="*30)
+
+# play_quiz 함수 수정
+def play_quiz(quizzes):
+    if not quizzes:
+        print("\n[알림] 등록된 퀴즈가 없습니다.")
+        return
+
+    score = 0
+    # ... (퀴즈 풀기 로직 동일) ...
+    for i, quiz in enumerate(quizzes, 1):
+        # ... (생략) ...
+        if quiz.check_answer(user_choice):
+            score += 1
+            
+    print(f"\n이번 게임 점수: {score} / {len(quizzes)}")
+    
+    # 최고 점수 갱신 로직 추가
+    current_high = load_high_score()
+    if score > current_high:
+        print(f"🎊 축하합니다! 최고 기록을 경신했습니다! ({current_high} -> {score})")
+        save_high_score(score)
+    else:
+        print(f"최고 기록({current_high}점) 경신에 실패했습니다. 다시 도전해보세요!")
+
 def main():
     quizzes = load_data()
     
