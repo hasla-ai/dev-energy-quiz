@@ -1,6 +1,43 @@
 import json
 import os
 
+class Quiz: 
+    # __init__: 퀴즈 하나가 가져야 할 필수 정보(문제, 4개 선택지, 정답 번호)를 초기화
+    def __init__(self, question, choices, answer):
+        """
+        :param question: 문제 내용 (문자열)
+        :param choices: 4개의 선택지 (리스트)
+        :param answer: 정답 번호 (1~4 정수)
+        """
+        self.question = question
+        self.choices = choices
+        self.answer = answer
+
+    # display_quiz: enumerate를 사용하여 선택지 앞에 1,2,3,4 번호를 자동으로 붙여 출력   
+    def display_quiz(self, index):
+        """문제를 화면에 출력합니다."""
+        print(f"\n[문제 {index}] {self.question}")
+        for i, choice in enumerate(self.choices, 1):
+            print(f"  {i}. {choice}")
+
+    # check_answer: 사용자의 입력값과 정답(self.answer)을 비교하여 True/False를 반환
+    def check_answer(self, user_choice):
+        """사용자가 입력한 번호가 정답인지 확인합니다."""
+        return self.answer == user_choice
+    
+    # to_dict: 나중에 JSON 파일로 저장할 때 클래스 객체를 바로 저장할 수 없으므로, 딕셔너리로 변환하는 편의 메서드를 추가
+    def to_dict(self):
+        """데이터 저장을 위해 딕셔너리 형태로 변환합니다."""
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer
+        }
+
+# 테스트용 예시 데이터 사용법:
+# q1 = Quiz("증기기관을 개량한 사람은?", ["뉴커먼", "와트", "에디슨", "테슬라"], 2)
+# q1.display_quiz(1)
+
 # [기본 데이터] 파일이 없거나 손상되었을 때 사용할 데이터
 DEFAULT_QUIZZES = [
     {"question": "증기기관을 개량하여 산업 혁명을 이끈 사람은?", "answer": "제임스 와트"},
