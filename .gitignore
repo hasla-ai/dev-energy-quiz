@@ -1,1 +1,5 @@
 __pycache__/
+*.pyc
+# state.json은 초기 데이터가 필요하다면 제외하지 않아도 되지만, 
+# 보통은 아래와 같이 제외하고 'state.json.example'을 만듭니다.
+# state.json 
